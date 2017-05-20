@@ -35,8 +35,9 @@ class Food {
 
     reproduce() {
         for (let i = 0; i < this.childrenNumber; i++){
-            this.children.push(new Food(
-                p5.Vector.add(this.position, createVector(random(30), random(30)))
+            this.children.push(new BeingBornFood(
+                // p5.Vector.add(this.position, createVector(random(30), random(30)))
+                this.position, createVector(random(30), random(30))
             ));
         }
     }
