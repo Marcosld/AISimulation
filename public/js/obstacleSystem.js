@@ -8,7 +8,7 @@ class ObstacleSystem {
             let size = ~~random(40, 60);
             let pos = newRandomPosition(size, width_, height_);
 
-            while(this.isInsideObstacle(pos) == true){
+            while(this.isInsideObstacle(pos, size) == true){
                 pos = newRandomPosition(size, width_ , height_);
             }
 
@@ -17,9 +17,9 @@ class ObstacleSystem {
         }
     }
 
-    isInsideObstacle(position){
+    isInsideObstacle(position, size = 0){
 
-        return this.obstacles.some(obstacle => dist(obstacle.position.x, obstacle.position.y, position.x, position.y) < obstacle.size);
+        return this.obstacles.some(obstacle => (dist(obstacle.position.x + obstacle.size / 2, obstacle.position.y + obstacle.size / 2, position.x, position.y) - size) < (obstacle.size / 2));
 
     }
 

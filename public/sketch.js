@@ -15,6 +15,17 @@ let foodSystem;
 let obstacleSystem;
 var rockImages = [];
 
+function isOutsideMap(position, size){
+    let aux = {x: false, y: false};
+
+    if((position.x - size / 2) < 0 || (position.x + size / 2) > 1000)
+        aux.x = true;
+    if((position.y - size / 2) < 0 || (position.y + size / 2) > 800)
+        aux.y = true
+
+    return aux;
+}
+
 function newRandomPosition(offset, width_, height_){
     return createVector(
         random(0 + offset, width_ - offset),
@@ -35,7 +46,9 @@ function setup() {
 
     foodSystem = new FoodSystem(100, width, height, obstacleSystem);
 
-    vehicles.push(new Vehicle(random(width), random(height)));
+    for (let i = 1; i <= 4; i++) {
+        vehicles.push(new Vehicle(random(width), random(height)));
+    }
 
 }
 

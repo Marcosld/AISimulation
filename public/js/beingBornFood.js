@@ -4,29 +4,46 @@ class BeingBornFood{
 
         this.initialPos = pos;
         this.position = this.initialPos.copy()
-        this.borningTime = 180;
+        this.borningTime = 60;
         this.startBornTime = frameCount;
         this.birthTime = this.startBornTime + this.borningTime;
         this.initialSize = 10;
-        this.bornSize = 1;
+        this.bornSize = 3;
         this.born = false;
 
-        this.initialVelocity = velocity;
+        this.velocity = velocity;
+        this.acceleration = 0.9;
 
     }
 
     update(){
 
-        if(this.birthTime >= frameCount){
+
+        if(frameCount >= this.birthTime){
             this.born = true;
         }
 
         this.size = map(this.beingBorningTime, 0, this.borningTime, this.bornSize, this.initialSize);
-        this.position.set(
-            ~~map(this.beingBorningTime, 0, this.borningTime, this.initialPos.x, this.initialPos.x + this.initialVelocity.x),
-            ~~map(this.beingBorningTime, 0, this.borningTime, this.initialPos.y, this.initialPos.y + this.initialVelocity.y)
-        )
+        this.position.add(this.velocity.x, this.velocity.y);
 
+        if(obstacleSystem.isInsideObstacle(this.position, this.size)){
+            this.velocity.mult(-0.9);
+            this.position.add(this.velocity.x, this.velocity.y);
+        }
+
+        let crashing = isOutsideMap(this.position, this.size);
+
+        if(crashing.x){
+            this.velocity.x = this.velocity.x * -0.9;
+            this.position.add(this.velocity.x, this.velocity.y);
+        }
+
+        if(crashing.y){
+            this.velocity.y = this.velocity.y * -0.9;
+            this.position.add(this.velocity.x, this.velocity.y);
+        }
+
+        this.velocity.mult(this.acceleration);
     }
 
     display() {

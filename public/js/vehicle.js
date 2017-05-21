@@ -5,8 +5,17 @@ function Vehicle(x, y) {
     this.maxspeed = 3;    // Maximum speed
     this.maxforce = 0.2;  // Maximum steering force
     this.acceleration = createVector(0, 0);
-    this.velocity = createVector(0, 0);
+    this.velocity = createVector(random(-1, 1), random(-1, 1));
     this.target = null;
+
+    // ADN FORCES
+    this.dna = [];
+    // Food attraction
+    this.dna[0] = random(1, 5);
+    // Vision distance
+    this.dna[1] = random(50, 200);
+    // Vision angle width
+    this.dna[2] = random(PI/2, 5*PI/4);
 
     this.findTarget = function(targets){
         let recordDistance = Infinity;
@@ -15,11 +24,18 @@ function Vehicle(x, y) {
             let evaluatedTarget = targets.get(i);
             let evaluatedTargetLocation = evaluatedTarget.getLocation();
             let evaluatedDistance = dist(this.position.x, this.position.y, evaluatedTargetLocation.x, evaluatedTargetLocation.y);
-            if (evaluatedDistance < recordDistance){
+            let evaluatedDistanceAngle = p5.Vector.sub(evaluatedTargetLocation, this.position).heading() + HALF_PI;
+            let direction = this.velocity.heading() + HALF_PI;
+            if (evaluatedDistance < recordDistance && evaluatedDistance <= this.dna[1] && (
+                evaluatedDistanceAngle > (direction - (this.dna[2] / 2)) &&
+                evaluatedDistanceAngle < (direction + (this.dna[2] / 2))
+            )){
                 recordDistance = evaluatedDistance;
                 closest = evaluatedTarget;
             }
         }
+        if(closest)
+        closest.spot();
         return closest;
     }
 
@@ -28,14 +44,19 @@ function Vehicle(x, y) {
         // Chose a new target
         this.target = this.findTarget(targets);
 
-        var seekForce = this.seek(this.target.getLocation());
+        if(this.target){
+            var seekForce = this.seek(this.target.getLocation());
 
-        this.applyForce(seekForce);
+            seekForce.mult(this.dna[0]);
 
-        // Eat food if close enough and find a new target
-        if(p5.Vector.dist(this.position, this.target.getLocation()) < 5){
-            this.target.eat();
+            this.applyForce(seekForce);
+
+            // Eat food if close enough
+            if(p5.Vector.dist(this.position, this.target.getLocation()) < this.r){
+                this.target.eat();
+            }
         }
+
     };
 
     this.applyForce = function(force) {
@@ -60,11 +81,20 @@ function Vehicle(x, y) {
     // Method to update
     this.update = function() {
 
+        if(obstacleSystem.isInsideObstacle(this.position, this.r)){ // when crashes with obstacle gets pushed back
+            this.velocity.mult(-1); // Go back to where it was
+            this.position.add(this.velocity);
+            this.velocity.mult(0.3)
+        }
+
         // Update velocity
         this.velocity.add(this.acceleration);
 
         // Limit speed
         this.velocity.limit(this.maxspeed);
+
+
+
         this.position.add(this.velocity);
 
         // Reset accelertion to 0 each cycle
@@ -73,5 +103,12 @@ function Vehicle(x, y) {
 
     this.display = function() {
         drawFish(this.position.x, this.position.y, this.velocity, this.r);
+        push();
+        noStroke();
+        fill('rgba(211, 211, 211, 0.3)');
+        translate(this.position.x, this.position.y);
+        rotate(atan2(this.velocity.y, this.velocity.x));
+        arc(0, 0, this.dna[1] * 2, this.dna[1] * 2, -this.dna[2] / 2, this.dna[2] / 2);
+        pop();
     };
 }

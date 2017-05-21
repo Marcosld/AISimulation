@@ -9,7 +9,7 @@ class FoodSystem {
 
             let pos = newRandomPosition(10, maxX, maxY);
 
-            while(obstacleSystem.isInsideObstacle(pos)){
+            while(obstacleSystem.isInsideObstacle(pos, 10)){
                 pos = newRandomPosition(10, maxX, maxY);
             }
 

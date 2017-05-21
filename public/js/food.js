@@ -9,15 +9,17 @@ class Food {
         this.reproductionTime = reproductionTime;
         this.children = [];
         this.childrenNumber = childrenNumber;
+        this.color = [118, 255, 3]
     }
 
     display() {
-        fill(118, 255, 3);
+        fill(...this.color);
         noStroke();
         push();
         translate(this.position.x, this.position.y);
         ellipse(0, 0, this.size);
         pop();
+        this.color = [118, 255, 3];
     }
 
     update() {
@@ -37,7 +39,7 @@ class Food {
         for (let i = 0; i < this.childrenNumber; i++){
             this.children.push(new BeingBornFood(
                 // p5.Vector.add(this.position, createVector(random(30), random(30)))
-                this.position, createVector(random(30), random(30))
+                this.position, createVector(random(-10, 10), random(-10, 10))
             ));
         }
     }
@@ -48,6 +50,10 @@ class Food {
 
     get lifetime() {
         return frameCount - this.birthTime;
+    }
+
+    spot(){
+        this.color = [255, 0, 0];
     }
 
 
