@@ -19,7 +19,7 @@ class ObstacleSystem {
 
     isInsideObstacle(position, size = 0){
 
-        return this.obstacles.some(obstacle => (dist(obstacle.position.x + obstacle.size / 2, obstacle.position.y + obstacle.size / 2, position.x, position.y) - size) < (obstacle.size / 2));
+        return this.obstacles.some(obstacle => (dist(obstacle.position.x + (obstacle.size / 2) - 8, obstacle.position.y + (obstacle.size / 2) - 8, position.x, position.y) - size) < (obstacle.size / 2));
 
     }
 
@@ -27,6 +27,14 @@ class ObstacleSystem {
 
         this.obstacles.forEach(obstacle => obstacle.display());
 
+    }
+
+    get length(){
+        return this.obstacles.length;
+    }
+
+    get (index){
+        return this.obstacles[index];
     }
 
 }

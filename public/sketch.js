@@ -5,12 +5,12 @@
 // Separation
 // Via Reynolds: http://www.red3d.com/cwr/steer/
 
-// A list of vehicles
+// A list of fishes
 
 // http-server -c-1
 
 
-let vehicles = [];
+let fishes = [];
 let foodSystem;
 let obstacleSystem;
 var rockImages = [];
@@ -44,10 +44,10 @@ function setup() {
     obstacleSystem = new ObstacleSystem(10, width, height, rockImages);
 
 
-    foodSystem = new FoodSystem(100, width, height, obstacleSystem);
+    foodSystem = new FoodSystem(200, width, height, obstacleSystem);
 
-    for (let i = 1; i <= 4; i++) {
-        vehicles.push(new Vehicle(random(width), random(height)));
+    for (let i = 0; i < 4; i++) {
+        fishes.push(new Fish(random(width), random(height)));
     }
 
 }
@@ -60,10 +60,13 @@ function draw() {
 
     obstacleSystem.display();
 
-    for (let i = 0; i < vehicles.length; i++) {
-        vehicles[i].applyBehaviors(foodSystem);
-        vehicles[i].update();
-        vehicles[i].display();
+    for (let i = fishes.length - 1; i >= 0; i--) {
+        fishes[i].applyBehaviors(foodSystem, obstacleSystem);
+        fishes[i].update();
+        fishes[i].display();
+        if(fishes[i].health <= 0){
+            fishes.splice(i, 1);
+        }
     }
 
 }

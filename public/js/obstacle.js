@@ -10,4 +10,8 @@ class Obstacle {
         image(this.image, this.position.x, this.position.y, this.size, this.size);
     }
 
+    getLocation() {
+        return this.position.copy();
+    }
+
 }
