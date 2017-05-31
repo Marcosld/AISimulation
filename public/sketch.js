@@ -10,7 +10,7 @@
 // http-server -c-1
 
 
-let fishes = [];
+let fishSystem;
 let foodSystem;
 let obstacleSystem;
 var rockImages = [];
@@ -46,9 +46,7 @@ function setup() {
 
     foodSystem = new FoodSystem(200, width, height, obstacleSystem);
 
-    for (let i = 0; i < 4; i++) {
-        fishes.push(new Fish(random(width), random(height)));
-    }
+    fishSystem = new FishSystem(4, width, height, foodSystem, obstacleSystem);
 
 }
 
@@ -60,13 +58,7 @@ function draw() {
 
     obstacleSystem.display();
 
-    for (let i = fishes.length - 1; i >= 0; i--) {
-        fishes[i].applyBehaviors(foodSystem, obstacleSystem);
-        fishes[i].update();
-        fishes[i].display();
-        if(fishes[i].health <= 0){
-            fishes.splice(i, 1);
-        }
-    }
+    fishSystem.update();
+    fishSystem.display();
 
 }
