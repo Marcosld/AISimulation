@@ -31,7 +31,7 @@ class FoodSystem {
         for (let i = this.beingBornFood.length - 1; i >= 0; i--){
             this.beingBornFood[i].update();
             if(this.beingBornFood[i].born){
-                this.food.push(new Food(this.beingBornFood[i].position));
+                this.food.push(new Food(this.beingBornFood[i].position, this.beingBornFood[i].dna));
                 this.beingBornFood.splice(i, 1);
             }
         }

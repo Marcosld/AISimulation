@@ -1,6 +1,6 @@
 class BeingBornFood{
 
-    constructor(pos, velocity){
+    constructor(pos, velocity, dna = null){
 
         this.initialPos = pos;
         this.position = this.initialPos.copy()
@@ -10,6 +10,8 @@ class BeingBornFood{
         this.initialSize = 10;
         this.bornSize = 3;
         this.born = false;
+
+        this.dna = dna;
 
         this.velocity = velocity;
         this.acceleration = 0.9;

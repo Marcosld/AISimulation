@@ -1,14 +1,40 @@
 class Food {
 
-    constructor(pos, reproductionTime = ~~random(500, 900), childrenNumber = ~~random(1, 4)) {
+    constructor(pos, dna = null) {
         this.dead = false;
         this.position = pos;
         this.initialSize = 10;
         this.maxSize = 20;
         this.birthTime = frameCount;
-        this.reproductionTime = reproductionTime;
+        if(dna){
+            let mutation = ~~random(1, 50);
+            this.dna = dna;
+            if(mutation < 2){
+                this.dna[mutation].mutate(this);
+            }
+            this.reproductionTime = this.dna[0].prop;
+            this.childrenNumber = this.dna[1].prop;
+        }else{
+            this.reproductionTime = ~~random(500, 900);
+            this.childrenNumber = ~~random(1, 7);
+            this.dna = [
+                {
+                    prop: this.reproductionTime,
+                    mutate: function(food){
+                        food.dna[0].prop += ~~random(-300, 300);
+                        food.dna[0].prop = Math.abs(food.dna[0].prop);
+                    }
+                },
+                {
+                    prop: this.childrenNumber,
+                    mutate: function(food){
+                        food.dna[1].prop += ~~random(-3, 3);
+                        food.dna[1].prop = Math.abs(food.dna[1].prop);
+                    }
+                }
+            ];
+        }
         this.children = [];
-        this.childrenNumber = childrenNumber;
         this.color = [118, 255, 3]
     }
 
@@ -38,8 +64,7 @@ class Food {
     reproduce() {
         for (let i = 0; i < this.childrenNumber; i++){
             this.children.push(new BeingBornFood(
-                // p5.Vector.add(this.position, createVector(random(30), random(30)))
-                this.position, createVector(random(-10, 10), random(-10, 10))
+                this.position, createVector(random(-10, 10), random(-10, 10)), this.dna
             ));
         }
     }
