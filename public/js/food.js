@@ -16,7 +16,7 @@ class Food {
             this.childrenNumber = this.dna[1].prop;
         }else{
             this.reproductionTime = ~~random(500, 900);
-            this.childrenNumber = ~~random(1, 7);
+            this.childrenNumber = ~~random(2, 5);
             this.dna = [
                 {
                     prop: this.reproductionTime,

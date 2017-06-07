@@ -2,20 +2,31 @@ class FoodSystem {
 
     constructor(initialSize, maxX, maxY, obstacleSystem){
 
+        this.maxX = maxX;
+        this.maxY = maxY;
+
         this.food = [];
         this.beingBornFood = [];
 
-        for(let i = 0; i < initialSize; i++){
+        this.addFood(initialSize);
 
-            let pos = newRandomPosition(10, maxX, maxY);
+    }
+
+    addFood(num){
+        for(let i = 0; i < num; i++){
+
+            let pos = newRandomPosition(10, this.maxX, this.maxY);
 
             while(obstacleSystem.isInsideObstacle(pos, 10)){
-                pos = newRandomPosition(10, maxX, maxY);
+                pos = newRandomPosition(10, this.maxX, this.maxY);
             }
 
             this.food.push(new Food(pos));
         }
+    }
 
+    removeFood(num){
+        this.food.splice(~~random(0, this.food.length - num), num);
     }
 
     update(){

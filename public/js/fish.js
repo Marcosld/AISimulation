@@ -1,6 +1,6 @@
 class Fish {
 
-    constructor(pos, reproductionTime = ~~random(500, 900), maxLifeTime = 1500){
+    constructor(pos, dna){
         this.position = pos;
         this.r = 12;
         this.maxspeed = 3;    // Maximum speed
@@ -12,20 +12,64 @@ class Fish {
         this.health = this.maxHealth;
         this.birthTime = frameCount;
         this.lastReproductionTime = frameCount;
-        this.reproductionTime = reproductionTime;
-        this.maxLifeTime = maxLifeTime;
+        this.maxLifeTime = 1500;
         this.children = [];
 
-        // ADN FORCES
-        this.dna = [];
-        // Food attraction
-        this.dna[0] = random(1, 3);
-        // Vision distance
-        this.dna[1] = random(100, 400);
-        // Vision angle width
-        this.dna[2] = random(PI/2, 5*PI/4);
-        // Rock attraction
-        this.dna[3] = random(-2, 0.5);
+        if(dna){
+            let mutation = ~~random(1, 50);
+            this.dna = dna;
+            if(mutation < 5){
+                this.dna[mutation].mutate(this);
+            }
+            this.reproductionTime = this.dna[4].prop;
+        }else{
+            this.reproductionTime = ~~random(500, 900);
+            // ADN FORCES
+            this.dna = [
+                // Food attraction (prop 0)
+                {
+                    prop: random(1, 3),
+                    mutate: function(fish){
+                        fish.dna[0].prop += ~~random(-1, 1);
+                        fish.dna[0].prop = Math.abs(fish.dna[0].prop);
+                    }
+
+                },
+                // Vision distance (prop 1)
+                {
+                    prop: random(100, 400),
+                    mutate: function(fish){
+                        fish.dna[1].prop += ~~random(-200, 200);
+                        fish.dna[1].prop = Math.abs(fish.dna[1].prop);
+                    }
+                },
+                // Vision angle width (prop 2)
+                {
+                    prop: random(PI/2, 5*PI/4),
+                    mutate: function(fish){
+                        fish.dna[2].prop += ~~random(-PI/2, PI/2);
+                        fish.dna[2].prop = Math.abs(fish.dna[2].prop);
+                    }
+                },
+                // Rock attraction (prop 3)
+                {
+                    prop: random(-2, 0.5),
+                    mutate: function(fish){
+                        fish.dna[3].prop += ~~random(-1, 1);
+                    }
+                },
+                // reproduction reproduction time (prop 4)
+                {
+                    prop: this.reproductionTime,
+                    mutate: function(fish){
+                        fish.dna[4].prop += ~~random(-550, 550);
+                        fish.dna[4].prop = Math.abs(fish.dna[4].prop);
+                    }
+                }
+            ];
+        }
+
+
     }
 
 
@@ -69,15 +113,16 @@ class Fish {
             let evaluatedTargetLocation = evaluatedTarget.getLocation();
             let evaluatedDistance = dist(this.position.x, this.position.y, evaluatedTargetLocation.x, evaluatedTargetLocation.y);
             let evaluatedTargetVector = p5.Vector.sub(evaluatedTargetLocation, this.position);
-            if (evaluatedDistance < recordDistance && evaluatedDistance <= this.dna[1] && (
-                p5.Vector.angleBetween(this.velocity, evaluatedTargetVector) <= this.dna[2] / 2
+            if (evaluatedDistance < recordDistance && evaluatedDistance <= this.dna[1].prop && (
+                p5.Vector.angleBetween(this.velocity, evaluatedTargetVector) <= this.dna[2].prop / 2
             )){
                 recordDistance = evaluatedDistance;
                 closest = evaluatedTarget;
             }
         }
-        if(closest)
+        if(closest && DEBUG){
             closest.spot();
+        }
         return closest;
     }
 
@@ -88,8 +133,8 @@ class Fish {
             let evaluatedTargetLocation = evaluatedTarget.getLocation();
             let evaluatedDistance = dist(this.position.x, this.position.y, evaluatedTargetLocation.x, evaluatedTargetLocation.y);
             let evaluatedTargetVector = p5.Vector.sub(evaluatedTargetLocation, this.position);
-            if (evaluatedDistance <= this.dna[1] && (
-                p5.Vector.angleBetween(this.velocity, evaluatedTargetVector) <= this.dna[2] / 2
+            if (evaluatedDistance <= this.dna[1].prop && (
+                p5.Vector.angleBetween(this.velocity, evaluatedTargetVector) <= this.dna[2].prop / 2
             )){
                 visibles.push(evaluatedTarget)
             }
@@ -108,7 +153,7 @@ class Fish {
         if(this.food){
             let attractionForce = this.getAttractionForce(this.food.getLocation());
 
-            attractionForce.mult(this.dna[0]);
+            attractionForce.mult(this.dna[0].prop);
 
             this.applyForce(attractionForce);
 
@@ -123,7 +168,7 @@ class Fish {
             for(let i in obstacles){
                 let attractionForce = this.getAttractionForce(obstacles[i].getLocation());
 
-                attractionForce.mult(this.dna[3]);
+                attractionForce.mult(this.dna[3].prop);
 
                 this.applyForce(attractionForce);
             }
@@ -197,22 +242,54 @@ class Fish {
     };
 
     reproduce(){
-        this.children.push(new Fish(
-            p5.Vector.add(this.position, createVector(random(5, 15), random(5, 15)))
+        this.children.push(new BeingBornFish(
+            this.position, this.dna, this.velocity
         ));
-        this.children.push(new Fish(
-            p5.Vector.add(this.position, createVector(random(5, 15), random(5, 15)))
+        this.children.push(new BeingBornFish(
+            this.position, this.dna, this.velocity
         ));
     }
 
     display() {
         drawFish(this.position.x, this.position.y, this.velocity, this.r, this.health, this.maxHealth);
+        if(DEBUG){
+            this.displayDebug();
+            if(p5.Vector.dist(createVector(mouseX, mouseY), this.position) < 100){
+                this.showInfo();
+            }
+        }
+    };
+
+    displayDebug(){
         push();
         noStroke();
         fill('rgba(211, 211, 211, 0.3)');
         translate(this.position.x, this.position.y);
         rotate(atan2(this.velocity.y, this.velocity.x));
-        arc(0, 0, this.dna[1] * 2, this.dna[1] * 2, -this.dna[2] / 2, this.dna[2] / 2);
+        arc(0, 0, this.dna[1].prop * 2, this.dna[1].prop * 2, -this.dna[2].prop / 2, this.dna[2].prop / 2);
+        strokeWeight(4);
+        stroke(51, 102, 0);
+        line(0, 0, 30 * this.dna[0].prop, 0);
+        stroke(255, 0, 0);
+        line(0, 0, 30 * this.dna[3].prop, 0);
         pop();
-    };
+    }
+
+    showInfo(){
+        push();
+        translate(this.position.x, this.position.y);
+        fill(245, 124, 0);
+        noStroke();
+        textSize(15);
+        textStyle(BOLD);
+        text(
+            `Food attraction: ${parseFloat(this.dna[0].prop.toFixed(3))}
+Rock repulsion: ${parseFloat(-this.dna[3].prop.toFixed(3))}
+Reproduction time: ${parseFloat(this.dna[4].prop.toFixed(3))}`,
+            -100,
+            -15
+        )
+        pop();
+    }
+
 }

@@ -1,4 +1,4 @@
-function drawFish(x, y, direction, size, health, maxHealth){
+function drawFish(x, y, direction, size, health = 100, maxHealth = 100){
 
     this.angleDirection = atan2(direction.y, direction.x);
     this.angleDiffSize = HALF_PI;
